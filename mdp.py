@@ -14,7 +14,7 @@ with open(src_path, 'r') as inp:
         els = []
         for b in blocks:
             x = [(m.start(0), m.end(0), b) for m in re.finditer(b['mdp'], line)]
-        els += x
+            els += x
         els.sort(key=lambda x: x[0])
         nl = ''
         last = 0
