@@ -1,46 +1,36 @@
-needed_att = ['name', 'md_begin', 'md_end', 'lat_begin',
-                'lat_end']
+from cfg_parser import parse_cfg 
+from stack import Symstack
 
-def parse_cfg(file_path):
-    with open(file_path, 'r') as inp:
-        blocks = []
-        b = {}
-        for line in inp:
-            if line[0] == '#':
-                continue
-            elif line[0] == '[' and ']' in line:
-                if len(b) != 0:
-                    b = validate_block(b)
-                    blocks.append(b)
-                b = {}
-                b['name'] = line.split(']')[0][1:]
-            elif ':' in line:
-                line = line.split(':')
-                att = line[0]
-                val = line[1]
-                val = val.replace(' ', '')
-                val = val.replace('\n', '')
-                b[att] = val
-        if len(b) != 0:
-            b = validate_block(b)
-            blocks.append(b)
-        return blocks
+src_path = 'f.mdp'
+cfg_path = 'f.cfg'
 
+stack = Symstack()
+txt = ''
 
-def validate_block(b):
-    for att in needed_att:
-        if att not in b:
-            raise Exception('{} not in block {}'.format(att, b))
-    if 'nestable' in b:
-        if b['nestable'] == 'yes':
-            b['nestable'] = True
-        elif b['nestable'] == 'flase':
-            b['nestable'] = False
-        else:
-            raise Exception('In block {}, nested has not a yes/no value'.format(b[name]))
-    return b
+blocks = parse_cfg(cfg_path)
+with open(src_path, 'r') as inp:
+    for line in inp:
+        els = []
+        for b in blocks:
+            #TODO: rough here
+            n = line.find(b['mdp'])
+            while n != -1:
+                els.append((n, b))
+                n = line.find(b['mdp'], n+1)
+        els.sort(key=lambda x: x[0])
+        nl = ''
+        last = 0
+        for n, b in els:
+            s = stack.add(b)            
+            if n != 0:
+                nl += line[last:n]
+            nl += s
+            last = n + len(b['mdp'])
+        nl += line[last:]
+        txt += nl
+if stack.len != 0:
+    raise Exception('Error: blocks do not close')
 
-
-a = parse_cfg('f.cfg')
-print(a)
+print(txt)
+            
 
