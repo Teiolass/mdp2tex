@@ -13,8 +13,24 @@ with open(src_path, 'r') as inp:
     for line in inp:
         els = []
         for b in blocks:
-            x = [(m.start(0), m.end(0), b) for m in re.finditer(b['mdp'], line)]
-            els += x
+            if b['mode'] == 'brack':
+                x = [(m.start(0), m.end(0), b) for m in 
+                        re.finditer(b['mdp'], line)]
+                els += x
+            if b['mode'] == 'line':
+                x = [(m.start(0), m.end(0), b) for m in 
+                        re.finditer(b['mdp'], line)]
+                if len(x) != 0:
+                    last = len(line) - 1
+                    x.append((last, last, b))
+                els += x
+            if b['mode'] == 'block':
+                regex = r'\'\'\'{}\s'.format(b['mdp'])
+                if re.match(regex, line):
+                    els.append((0, len(line)-1, b))
+        if re.match(r'\'\'\'$', line):
+            els.append((0, len(line)-1, 'ENDBLOCK'))
+                
         els.sort(key=lambda x: x[0])
         nl = ''
         last = 0

@@ -1,4 +1,4 @@
-needed_att = ['name']
+needed_att = ['name', 'mode', 'mdp', 'lat_begin', 'lat_end']
 
 def parse_cfg(file_path):
     with open(file_path, 'r') as inp:
@@ -19,6 +19,11 @@ def parse_cfg(file_path):
                 val = line[1]
                 val = val.replace(' ', '')
                 val = val.replace('\n', '')
+                if val == 'void':
+                    val = ''
+                val = val.replace('\\n', '\n')
+                val = val.replace('\\space', ' ')
+
                 b[att] = val
         if len(b) != 0:
             b = validate_block(b)
@@ -30,12 +35,5 @@ def validate_block(b):
     for att in needed_att:
         if att not in b:
             raise Exception('{} not in block {}'.format(att, b))
-    if 'nestable' in b:
-        if b['nestable'] == 'yes':
-            b['nestable'] = True
-        elif b['nestable'] == 'flase':
-            b['nestable'] = False
-        else:
-            raise Exception('In block {}, nested has not a yes/no value'.format(b[name]))
     return b
 
