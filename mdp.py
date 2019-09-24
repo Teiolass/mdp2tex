@@ -1,10 +1,12 @@
 from cfg_parser import parse_cfg
 from intro import *
+from injector import *
 from stack import Symstack
 import re
 
 src_path = 'f.mdp'
 cfg_path = 'f.cfg'
+tem_path = 'temps/main.tex'
 
 
 def simple_read(lines, blocks):
@@ -48,6 +50,9 @@ def simple_read(lines, blocks):
 blocks = parse_cfg(cfg_path)
 with open(src_path, 'r') as inp:
     attributes = intro_read(inp)
-    print(parse_atts(attributes))
-    for nl in simple_read(inp, blocks):
-        print(nl, end='')
+    intro = parse_atts(attributes)
+    main = ''
+    for line in simple_read(inp, blocks):
+        main += line
+tex = inject(intro, main, tem_path)
+print(tex)
