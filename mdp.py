@@ -1,4 +1,5 @@
 from cfg_parser import parse_cfg
+from intro import *
 from stack import Symstack
 import re
 
@@ -44,20 +45,9 @@ def simple_read(lines, blocks):
         raise Exception('Error: blocks do not close')
 
 
-def intro_read(lines):
-    attributes = {}
-    for line in lines:
-        if 9*'-' in line:
-            return attributes
-        att = re.findall(r'^.*(?=:)', line)
-        val = re.findall(r'(?<=").*(?=")', line)
-        if len(att) != 0 and len(val) != 0:
-            attributes[att[0]] = val[0]
-
-
 blocks = parse_cfg(cfg_path)
 with open(src_path, 'r') as inp:
     attributes = intro_read(inp)
-    print(attributes)
+    print(parse_atts(attributes))
     for nl in simple_read(inp, blocks):
         print(nl, end='')
