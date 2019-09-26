@@ -54,5 +54,6 @@ with open(src_path, 'r') as inp:
     main = ''
     for line in simple_read(inp, blocks):
         main += line
-tex = inject(intro, main, tem_path)
+    attributes['main'] = main
+tex = inject(attributes, tem_path)
 print(tex)
